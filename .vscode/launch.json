@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "src.Main",
+            "projectName": "HW3_DataStruct_c067a917"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open Project.html",
+            "file": "d:\\לימוד\\ניהול פרויקטים\\Project.html"
+        }
+    ]
+}

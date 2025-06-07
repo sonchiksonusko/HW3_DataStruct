@@ -1,0 +1,67 @@
+// File: Utils.java
+import java.io.*;
+import java.util.*;
+
+public class Utils {
+
+    public static void readMatchesAndMapsFromCSV(String myFile) {
+        ArrayList<Match> allMatches = new ArrayList<>();
+        HashMap<String, List<Match>> tourneyMatches = new HashMap<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(myFile))) {
+            String line;
+            boolean firstLine = true;
+
+            while ((line = br.readLine()) != null) {
+                if (firstLine) {
+                    firstLine = false; // skip header
+                    continue;
+                }
+                String[] values = line.split(",", -1);
+
+                // Check for missing important columns
+                if (values.length < 19) continue;
+
+                String tourneyId = values[0] != null ? values[0].trim() : "";
+                String tourneyName = values[1] != null ? values[1].trim() : "";
+                String winnerId = values[7] != null ? values[7].trim() : "";
+                String winnerName = values[10] != null ? values[10].trim() : "";
+                String loserId = values[15] != null ? values[15].trim() : "";
+                String loserName = values[18] != null ? values[18].trim() : "";
+
+                // Check for missing data after assignment
+                if (tourneyId.isEmpty() || tourneyName.isEmpty() ||
+                    winnerId.isEmpty() || winnerName.isEmpty() ||
+                    loserId.isEmpty() || loserName.isEmpty()) {
+                    // Skip this entry (or handle as you wish)
+                    continue;
+                }
+                String surface = values[2] != null ? values[2].trim() : "";
+                int drawSize = parseIntSafe(values[3]!= null ? values[3].trim() : "-1");
+                String tourneyLevel = values[4] != null ? values[4].trim() : "";
+                String tourneyDate = values[5] != null ? values[5].trim() : "";
+                int matchNum = parseIntSafe(values[6]!= null ? values[6].trim() : "-1");
+
+                Match match = new Match(
+                    tourneyId, tourneyName, surface, drawSize, tourneyLevel,
+                    tourneyDate, matchNum, winnerId, winnerName, loserId, loserName
+                );
+
+                allMatches.add(match);
+                tourneyMatches.computeIfAbsent(tourneyId, k -> new ArrayList<>()).add(match);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private static int parseIntSafe(String s) {
+        try {
+            return s == null || s.trim().isEmpty() ? 0 : Integer.parseInt(s.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+}
