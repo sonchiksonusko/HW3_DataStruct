@@ -3,6 +3,8 @@ import src.Match;
 import src.Player;
 import src.Tournament;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 public class Comparators {
 public static class MatchDurationComparator implements Comparator<Match> {
@@ -17,24 +19,43 @@ public static class MatchDurationComparator implements Comparator<Match> {
 }
 
 
-/*public static class TournamrntWinnerComparator implements Comparator<Tournament> {
-        @Override
-        public int compare(Player p1, Player p2) {
-            // Сравнение игроков по количеству выигранных турниров
-            int wins1 = countTournamentsWon(p1);
-            int wins2 = countTournamentsWon(p2);
-            return Integer.compare(wins2, wins1); // Сортировка по убыванию
-        }
-        private int countTournamentsWon(Player player) {
-            int count = 0;
-            for (Match match : player.getMatchesPlayed()) {
-                if (match.getWinner().getPlayerId().equals(player.getPlayerId())) {
-                    count++;
+public static class TournamentWinnerComparator implements Comparator<Player> {
+    private final Map<String, Tournament> allTournaments;
+    private final Map<String,List<Match>> tourneyMatches;
+
+    public TournamentWinnerComparator(Map<String, Tournament> allTournaments,Map<String,List<Match>> tourneyMatches) {
+        this.allTournaments = allTournaments;
+        this.tourneyMatches = tourneyMatches;
+    }
+   
+
+    @Override
+    public int compare(Player p1, Player p2) {
+        // Сравнение игроков по количеству выигранных турниров
+        int wins1 = countTournamentsWon(p1);
+        int wins2 = countTournamentsWon(p2);
+        return Integer.compare(wins2, wins1); // Сортировка по убыванию
+    }
+
+    private int countTournamentsWon(Player player) {
+        int count = 0;
+        for (Tournament t : allTournaments.values()) {
+            List<Match> matches = t.tourneyId != null ? tourneyMatches.get(t.getTourneyId()) : null;
+            if (matches != null) {
+                for (Match match : matches) {
+                    if ("F".equals(match.getRound())) { 
+                        Player winner = match.getWinner();
+                        if (winner != null && winner.getPlayerId().equals(player.getPlayerId())) {
+                            count++;
+                        }
+                    }
                 }
             }
-            return count;
         }
-    }*/
+        return count;
+    }
+}
+
     public static class MatchScoreComparator implements Comparator<Match> {
         @Override
         public int compare(Match m1, Match m2) {

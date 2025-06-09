@@ -17,6 +17,11 @@ public String tourneyId;      // Unique tournament code, e.g. "2010-339"
         this.date = date;
     }
 
+public static Player getWinner(Match match) {
+        return match.winner;
+    }
+
+
     @Override
     public String toString() {
         return tourneyId+" "+name + " (" + date + ")";

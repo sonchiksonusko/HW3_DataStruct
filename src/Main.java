@@ -17,7 +17,9 @@ public class Main {
     Map<String, List<Match>> tourneyMatches = new HashMap<>();
     List<Match> allMatches = new ArrayList<>();
     HashMap<String, Player> allPlayersMap = new HashMap<>();
-    readMatchesAndMapsFromCSV("atp_matches_2010.csv", allMatches, tourneyMatches, allPlayersMap);
+    Map<String, Tournament> allTournaments = new HashMap<>();
+
+    readMatchesAndMapsFromCSV("atp_matches_2010.csv", allMatches, tourneyMatches, allPlayersMap, allTournaments);
 
     // -------------------------------------------------------------------------------------------------------------------
     System.out.println("ACCORDING TO TOURNAMENT MATCHES");
@@ -34,8 +36,8 @@ public class Main {
     System.out.println("GET TOP 5 WINNERS in Maches");
     get_K_winners(playerArray, 5, new Comparators.PlayerWinningComparator());  
 
-    // System.out.println("GET TOP 5 WINNERS in Tournaments");
-    // get_K_winners(playerArray, 5, new Comparators.TournamentWinnerComparator());  
+    System.out.println("GET TOP 5 WINNERS in Tournaments");
+    get_K_winners(playerArray, 5, new Comparators.TournamentWinnerComparator(allTournaments,tourneyMatches));  
 }
 
 
@@ -43,7 +45,7 @@ public class Main {
 
 
 
-public static void readMatchesAndMapsFromCSV(String myFile, List<Match> allMatches, Map<String, List<Match>> tourneyMatches,  HashMap<String, Player> allPlayersMap) {
+public static void readMatchesAndMapsFromCSV(String myFile, List<Match> allMatches, Map<String, List<Match>> tourneyMatches,  HashMap<String, Player> allPlayersMap, Map<String, Tournament> allTournaments) {
     try (BufferedReader br = new BufferedReader(new FileReader(myFile))) {
         String line;
         boolean firstLine = true;
@@ -83,7 +85,12 @@ public static void readMatchesAndMapsFromCSV(String myFile, List<Match> allMatch
             String lioc = values[21] != null ? values[21].trim() : "";
             Double lage = parseDouble(values[22] != null ? values[22].trim() : "-1");  
 
-            Tournament tournament = new Tournament(tourneyId, tourneyName, surface, drawSize, tourneyLevel, tourneyDate);
+            Tournament tournament = allTournaments.get(tourneyId);
+            if (tournament == null) {
+                tournament = new Tournament(tourneyId, tourneyName, surface, drawSize, tourneyLevel, tourneyDate);
+                allTournaments.put(tourneyId, tournament);
+            }
+
             
             int matchNum = parseIntSafe(values[6]!= null ? values[6].trim() : "-1");
             
@@ -139,7 +146,8 @@ Player loser = allPlayersMap.getOrDefault(loserId, new Player(
             allPlayersMap.put(winnerId, winner);
             allPlayersMap.put(loserId, loser);
             allMatches.add(match);
-            tourneyMatches.computeIfAbsent(tourneyId, k -> new ArrayList<>()).add(match);
+           // tourneyMatches.computeIfAbsent(tourneyId, k -> new ArrayList<>()).add(match);
+            allTournaments.putIfAbsent(tourneyId, tournament);
             winner.addMatch(match);
             loser.addMatch(match);
             
