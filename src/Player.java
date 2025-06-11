@@ -18,8 +18,10 @@ public class Player  {
     public String rank;
     public String rankPoints;
     public List<Match> matchesPlayed = new ArrayList<>();
+    public List<Match> matchesWon = new ArrayList<>();
+    public List<Match> matchesLost = new ArrayList<>();
 
-    public Player(String playerId,String seed, String entry ,String name, String hand, Integer height, String ioc, Double age, String rank, String rankPoints) {
+    public Player(String playerId,String seed, String entry ,String name, String hand, Integer height, String ioc, Double age, String rank, String rankPoints, List<Match> matchesPlayed) {
         this.playerId = playerId;
         this.seed = seed;
         this.entry = entry;
@@ -30,6 +32,22 @@ public class Player  {
         this.age = age;
         this.rank = rank;
         this.rankPoints = rankPoints;
+        this.matchesPlayed = matchesPlayed != null ? matchesPlayed : new ArrayList<>();
+    }
+    public Player(String winnerId, String wseed, String wentry, String winnerName, String whand, Integer wheight,
+            String wioc, Double wage, String winner_rank, String winner_rank_points) {
+        this.playerId = winnerId;   
+        this.seed = wseed;
+                this.entry = wentry;
+                this.name = winnerName;
+                this.hand = whand;
+                this.height = wheight;
+                this.ioc = wioc;
+                this.age = wage;
+                this.rank = winner_rank;
+                this.rankPoints = winner_rank_points;
+                this.matchesPlayed = new ArrayList<>();
+    
     }
     public String getPlayerId() {
         return playerId;
@@ -55,8 +73,8 @@ public class Player  {
         this.entry = entry;
     }
 
-    public String getName() {
-        return name;
+    public static String getName(Player player) {
+        return player.name;
     }
 
     public void setName(String name) {

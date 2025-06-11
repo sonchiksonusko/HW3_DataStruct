@@ -12,14 +12,16 @@ import java.util.Map;
 import java.util.Set;
 import src.Comparators;
 public class Main {
+    static  Map<String, List<Match>> tourneyMatches = new HashMap<>();
+    static List<Match> allMatches = new ArrayList<>();
+    static HashMap<String, Player> allPlayersMap = new HashMap<>();
+    static Map<String, Tournament> allTournaments = new HashMap<>();
+    static HashMap<String,List<Player>> countryPlayerMap = new HashMap<>();
  public static void main(String[] args) {
     // Read matches and tournament maps from CSV
-    Map<String, List<Match>> tourneyMatches = new HashMap<>();
-    List<Match> allMatches = new ArrayList<>();
-    HashMap<String, Player> allPlayersMap = new HashMap<>();
-    Map<String, Tournament> allTournaments = new HashMap<>();
+    
 
-    readMatchesAndMapsFromCSV("atp_matches_2010.csv", allMatches, tourneyMatches, allPlayersMap, allTournaments);
+    readMatchesAndMapsFromCSV("atp_matches_2010.csv", allMatches, tourneyMatches, allPlayersMap, allTournaments,countryPlayerMap);
 
     // -------------------------------------------------------------------------------------------------------------------
     System.out.println("ACCORDING TO TOURNAMENT MATCHES");
@@ -38,6 +40,15 @@ public class Main {
 
     System.out.println("GET TOP 5 WINNERS in Tournaments");
     get_K_winners(playerArray, 5, new Comparators.TournamentWinnerComparator(allTournaments,tourneyMatches));  
+
+    System.out.println("By COUNTRY Players from same country");
+    printPlayersFromSameCountry(countryPlayerMap,"ISR");
+
+    System.out.println("Compare Players by Winning Count");
+    PlayerComparatorbywinningCount("Rafael Nadal", "Roger Federer");
+
+    System.out.println("Compare Players by Winning Percentage on Surface: "+"\n");
+    PlayerComparatorbywinningPercent("Rafael Nadal", "Roger Federer");
 }
 
 
@@ -45,7 +56,7 @@ public class Main {
 
 
 
-public static void readMatchesAndMapsFromCSV(String myFile, List<Match> allMatches, Map<String, List<Match>> tourneyMatches,  HashMap<String, Player> allPlayersMap, Map<String, Tournament> allTournaments) {
+public static void readMatchesAndMapsFromCSV(String myFile, List<Match> allMatches, Map<String, List<Match>> tourneyMatches,  HashMap<String, Player> allPlayersMap, Map<String, Tournament> allTournaments,HashMap<String,List<Player>> countryPlayerMap) {
     try (BufferedReader br = new BufferedReader(new FileReader(myFile))) {
         String line;
         boolean firstLine = true;
@@ -123,17 +134,34 @@ public static void readMatchesAndMapsFromCSV(String myFile, List<Match> allMatch
             String loser_rank = values[47]!= null ? values[47].trim() : "-1";
             String loser_rank_points = values[48]!= null ? values[48].trim() : "-1";
       
-          Player winner = allPlayersMap.getOrDefault(winnerId, new Player(
+          Player winner = allPlayersMap.getOrDefault(winnerName, new Player(
     winnerId, wseed, wentry, winnerName, whand, wheight, wioc, wage,
     winner_rank, winner_rank_points
 ));
-Player loser = allPlayersMap.getOrDefault(loserId, new Player(
+Player loser = allPlayersMap.getOrDefault(loserName, new Player(
     loserId, lseed, lentry, loserName, lhand, lheight, lioc, lage,
     loser_rank, loser_rank_points
 ));
            
             
+ if (!allPlayersMap.containsKey(winnerName)) {
+                winner = new Player(winnerId, wseed, wentry, winnerName, whand, wheight, wioc, wage,
+                                    winner_rank, winner_rank_points);
+                allPlayersMap.put(winnerName, winner);
+                countryPlayerMap.computeIfAbsent(wioc, k -> new ArrayList<>()).add(winner);
+            } else {
+                winner = allPlayersMap.get(winnerName);
+            }
 
+            loser = allPlayersMap.get(loserName);
+            if (loser == null) {
+                loser = new Player(loserId, lseed, lentry, loserName, lhand, lheight, lioc, lage,
+                                loser_rank, loser_rank_points);
+             allPlayersMap.put(loserName, loser);
+                countryPlayerMap.computeIfAbsent(lioc, k -> new ArrayList<>()).add(loser);
+            } else {
+                loser = allPlayersMap.get(loserName);
+            }
             // Create Match object
           
 
@@ -143,13 +171,27 @@ Player loser = allPlayersMap.getOrDefault(loserId, new Player(
             l_ace, l_df, l_svpt, l_1stIn, l_1stWon, l_2ndWon, l_SvGms, l_bpSaved, l_bpFaced
 );
 
-            allPlayersMap.put(winnerId, winner);
-            allPlayersMap.put(loserId, loser);
+           // allPlayersMap.put(winnerId, winner);
+          //  allPlayersMap.put(loserId, loser);
             allMatches.add(match);
-           // tourneyMatches.computeIfAbsent(tourneyId, k -> new ArrayList<>()).add(match);
+            //tourneyMatches.computeIfAbsent(tourneyId, k -> new ArrayList<>()).add(match);
             allTournaments.putIfAbsent(tourneyId, tournament);
             winner.addMatch(match);
             loser.addMatch(match);
+            winner.matchesWon.add(match);
+            loser.matchesLost.add(match);
+
+   
+           
+            //countryPlayerMap.putIfAbsent(wioc, new ArrayList<>());// Initialize if not present
+          //  countryPlayerMap.get(wioc).add(winner);// Add winner to the list for their country
+            
+
+            //countryPlayerMap.putIfAbsent(lioc, new ArrayList<>());
+           // countryPlayerMap.get(lioc).add(loser);
+            //System.out.println("Winner: " + winner.getName() + " from " + wioc);
+            //System.out.println("Loser: " + loser.getName() + " from " + lioc);
+
             
            // allplayers.add(loser);
         }
@@ -233,8 +275,117 @@ private static <T> void swap(T[] arr, int i, int j) {
 }
 
 
+public static void printPlayersFromSameCountry(HashMap<String,List<Player>> countryPlayerMap, String country) {
+   
+    Player[] players = countryPlayerMap.get(country).toArray(new Player[0]);
+   java.util.Arrays.sort(players, new Comparators.PlayerPercentageComparator());////add winner loser matches + ptint
+    System.out.println("Players from country " + country + ":");
+    for (Player player : players) {
+        System.out.println(Player.getName(player) + " - Matches Played: " +(player.matchesPlayed.size())+" Percentage "+ (player.matchesWon.size()*100.0 / player.matchesPlayed.size()) + " % "+ player.matchesWon.size()+" Wins");
+    }
+    // Uncomment to get top winners from this country
+    // System.out.println("Top winners from country " + country + ":");
+    // get_K_winners(players,players.length, new Comparators.PlayerWinningComparator());
+}
+
+public static void PlayerComparatorbywinningCount(String p1, String p2) {
+    Player player1 = allPlayersMap.get(p1);
+    Player player2 = allPlayersMap.get(p2);
+    int countplayer1wins = 0;
+    int countcommongames = 0;
+    int countplayer2wins = 0;
+    for(Match m : player1.matchesWon){
+        if(m.getLoser().getPlayerId().equals(player2.getPlayerId())) {
+            countcommongames++;
+            countplayer1wins++;
+        }
+    }
+    for(Match m : player2.matchesWon){
+        if(m.getLoser().getPlayerId().equals(player1.getPlayerId())) {
+            countcommongames++;
+            countplayer2wins++;
+        }
+    }
+    int compareResult = Integer.compare(countplayer1wins, countplayer2wins);
+    System.out.println("Player 1: " + player1.getName(player1) + " Wins: " + countplayer1wins);
+    System.out.println("Player 2: " + player2.getName(player2) + " Wins: " + countplayer2wins);
+    System.out.println("Common Games: " + countcommongames);
+    //System.out.println("Player 1 > player 2 ? " + (countplayer1wins > countplayer2wins ? "Yes" : "No"));
 
 
+}
+public static void PlayerComparatorbywinningPercent(String p1, String p2){
+    Player player1 = allPlayersMap.get(p1);
+    Player player2 = allPlayersMap.get(p2);
+    int p1counthard = 0, p1countclay = 0, p1countgrass = 0;
+    int p2counthard = 0, p2countclay = 0, p2countgrass = 0;
+    
+    HashMap<String, Integer> player1Wins = new HashMap<>();
+    HashMap<String, Integer> player2Wins = new HashMap<>();
+
+    for (Match m1 : player1.matchesWon) {
+        if(m1.getTournament().getSurface().equals("Hard")) {
+            player1Wins.put("Hard", player1Wins.getOrDefault("Hard", 0) + 1);
+            p1counthard++;   
+        }
+        else if(m1.getTournament().getSurface().equals("Clay")) {
+            player1Wins.put("Clay", player1Wins.getOrDefault("Clay", 0) + 1);
+            p1countclay++;
+        }
+        else if(m1.getTournament().getSurface().equals("Grass")) {
+            player1Wins.put("Grass", player1Wins.getOrDefault("Grass", 0) + 1);
+            p1countgrass++;
+        }
+    }
+     for (Match m2 : player1.matchesLost) {
+        if(m2.getTournament().getSurface().equals("Hard")) {
+            p1counthard++;   
+        }
+        else if(m2.getTournament().getSurface().equals("Clay")) {      
+            p1countclay++;
+        }
+        else if(m2.getTournament().getSurface().equals("Grass")) {
+            p1countgrass++;
+        }
+    }
+    for (Match m3 : player2.matchesWon) {
+        if(m3.getTournament().getSurface().equals("Hard")) {
+            player2Wins.put("Hard", player2Wins.getOrDefault("Hard", 0) + 1);
+            p2counthard++;
+        }
+        else if(m3.getTournament().getSurface().equals("Clay")) {
+            player2Wins.put("Clay", player2Wins.getOrDefault("Clay", 0) + 1);
+            p2countclay++;
+        }
+        else if(m3.getTournament().getSurface().equals("Grass")) {
+            player2Wins.put("Grass", player2Wins.getOrDefault("Grass", 0) + 1);
+            p2countgrass++;
+        }
+    }
+    for (Match m4 : player2.matchesLost) {
+        if(m4.getTournament().getSurface().equals("Hard")) {
+           p2counthard++;
+          
+        }
+        else if(m4.getTournament().getSurface().equals("Clay")) {
+           p2countclay++;
+        }
+        else if(m4.getTournament().getSurface().equals("Grass")) {
+            p2countgrass++;
+        }
+    }
+   
+ 
+System.out.print(player2Wins.get("Hard"));
+ System.out.println("p2counthard: " + p2counthard);
+    System.out.println(player1.getName(player1) + " Wins on Hard Percentage: " + player1Wins.get("Hard")*100/(p1counthard)  + " %" );
+    System.out.println( player1.getName(player1) + " Wins on Clay Percentage: " + player1Wins.get("Clay")*100/(p1countclay)  + " %" );
+    System.out.println(player1.getName(player1) + " Wins on Grass Percentage: " + player1Wins.get("Grass")*100/(p1countgrass)  + " %" + "\n");
+  
+    System.out.println(player2.getName(player2) + " Wins on Hard Percentage: " + player2Wins.get("Hard")*100/(p2counthard)  + " %" );
+    System.out.println( player2.getName(player2) + " Wins on Clay Percentage: " + player2Wins.get("Clay")*100/(p2countclay)  + " %" );      
+    System.out.println(player2.getName(player2) + " Wins on Grass Percentage: " + player2Wins.get("Grass")*100/(p2countgrass)  + " %" );
+}
 
 
 

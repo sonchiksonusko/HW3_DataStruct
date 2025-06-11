@@ -56,6 +56,9 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
     }
 }
 
+
+
+
     public static class MatchScoreComparator implements Comparator<Match> {
         @Override
         public int compare(Match m1, Match m2) {
@@ -82,5 +85,50 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
         }
         return count;
     }
-}
+}public static class PlayerPercentageComparator implements Comparator<Player> {
+        @Override
+        public int compare(Player p1, Player p2) {
+            double winPercentage1 = calculateWinPercentage(p1);
+            double winPercentage2 = calculateWinPercentage(p2);
+            int loseCount1 = 0;
+            int loseCount2 = 0;
+            // i need to add winner and loser matches !!!!!!!!!!!!!!!!!!!!!!!!!!
+            int winCount1 =0;// i need to add winner and loser matches !!!!!!!!!!!!!!!!!!!!!!!!!!
+            for (Match match : p1.getMatchesPlayed()) {
+                if(match.getWinner().getPlayerId().equals(p1.getPlayerId())) {
+                    winCount1++;
+                } 
+                if(match.getLoser().getPlayerId().equals(p1.getPlayerId())) {
+                    loseCount1++;
+                }
+
+            }
+            int winCount2 = 0;
+            for (Match match : p2.getMatchesPlayed()) {
+                if (match.getWinner() != null && match.getWinner().getPlayerId().equals(p2.getPlayerId())) {
+                    winCount2++;
+                } 
+                 if(match.getLoser().getPlayerId().equals(p1.getPlayerId())) {
+                    loseCount2++;
+                }
+            }
+
+            if(Double.compare(winPercentage2, winPercentage1)!=0)   
+            return Double.compare(winPercentage2, winPercentage1); 
+            else
+                return Integer.compare(winCount2, winCount1); 
+        
+        }
+
+        private double calculateWinPercentage(Player player) {
+            int wins = 0;
+            int totalMatches = player.getMatchesPlayed().size();
+            for (Match match : player.getMatchesPlayed()) {
+                if (match.getWinner() != null && match.getWinner().getPlayerId().equals(player.getPlayerId())) {
+                    wins++;
+                }
+            }
+            return totalMatches > 0 ? (double) wins / totalMatches : 0.0;
+        }
+    }
 }
