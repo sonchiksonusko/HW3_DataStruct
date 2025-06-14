@@ -20,6 +20,7 @@ public class Player  {
     public List<Match> matchesPlayed = new ArrayList<>();
     public List<Match> matchesWon = new ArrayList<>();
     public List<Match> matchesLost = new ArrayList<>();
+    public int minutesPlayed = 0; // total minutes played in matches
 
     public Player(String playerId,String seed, String entry ,String name, String hand, Integer height, String ioc, Double age, String rank, String rankPoints, List<Match> matchesPlayed) {
         this.playerId = playerId;

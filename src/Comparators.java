@@ -5,6 +5,7 @@ import src.Tournament;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import src.Main;
 
 public class Comparators {
 public static class MatchDurationComparator implements Comparator<Match> {
@@ -20,13 +21,6 @@ public static class MatchDurationComparator implements Comparator<Match> {
 
 
 public static class TournamentWinnerComparator implements Comparator<Player> {
-    private final List<Match> finalMatches;
-    //private final Map<String,List<Match>> tourneyMatches;
-
-    public TournamentWinnerComparator(List<Match> finalMatches)  {
-        this.finalMatches = finalMatches;
-        //this.tourneyMatches = tourneyMatches;
-    }
    
 
     @Override
@@ -34,12 +28,12 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
 //compare by number of tournaments won
         int wins1 = countTournamentsWon(p1);
         int wins2 = countTournamentsWon(p2);
-        return Integer.compare(wins1, wins2); //decreasing order
+        return Integer.compare(wins2, wins1); //decreasing order
     }
 
-    private int countTournamentsWon(Player player) {
+    public static int countTournamentsWon(Player player) {
         int count = 0;
-        for (Match m : finalMatches) {
+        for (Match m : Main.finalMatches) {
             
                 if (m.getWinner().getPlayerId().equals(player.getPlayerId())) {
                 count++; // skip if winner is null    
@@ -86,7 +80,7 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
         int wins1 = countWins(p1);
         int wins2 = countWins(p2);
 
-        return Integer.compare(wins1, wins2); 
+        return Integer.compare(wins2, wins1); 
     }
 
     public static int countWins(Player p) {

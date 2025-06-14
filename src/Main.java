@@ -69,7 +69,7 @@ public class Main {
 
     System.out.println("GET TOP 5 WINNERS in Tournaments");
 
-    get_K_winners(playerArray, 7, new Comparators.TournamentWinnerComparator(finalMatches));  
+    get_K_winners(playerArray, 7, new Comparators.TournamentWinnerComparator());  
     System.out.println("----------------------------------------------------------------------------------------------");
 
 
@@ -220,6 +220,8 @@ Player loser = allPlayersMap.getOrDefault(loserName, new Player(
             loser.addMatch(match);
             winner.matchesWon.add(match);
             loser.matchesLost.add(match);
+            winner.minutesPlayed += minutes;
+            loser.minutesPlayed += minutes;
 
    
            
@@ -267,15 +269,16 @@ public static <T> void get_K_winners(T[] arr, int k, Comparator<T> comparator) {
     if (k < 0 || k >= arr.length) {
         throw new IllegalArgumentException("Invalid value of k");
     }
-   quickselect(arr, 0, arr.length - 1, arr.length - k , comparator);
+   quickselect(arr, 0, arr.length - 1, k , comparator);
    List<T> result = new ArrayList<>();
-     for (int i = arr.length - k; i < arr.length; i++) {
+     for (int i = 0; i < k; i++ ) {
         result.add(arr[i]); // Get the k largest elements
     }
 
     result.sort(comparator); // Sort the result in descending order
-    for (int i = result.size() - 1; i >= 0; i--) {
+    for (int i = 0 ; i < result.size(); i++) {
         System.out.println(result.get(i)); // Print the k largest elements
+       System.out.print( Comparators.TournamentWinnerComparator.countTournamentsWon((Player)result.get(i)));
     }
 }
 
