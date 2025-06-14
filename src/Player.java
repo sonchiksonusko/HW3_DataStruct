@@ -22,7 +22,7 @@ public class Player  {
     public List<Match> matchesLost = new ArrayList<>();
     public int minutesPlayed = 0; // total minutes played in matches
 
-    public Player(String playerId,String seed, String entry ,String name, String hand, Integer height, String ioc, Double age, String rank, String rankPoints, List<Match> matchesPlayed) {
+    public Player(String playerId,String seed, String entry ,String name, String hand, Integer height, String ioc, Double age, String rank, String rankPoints, List<Match> matchesPlayed,int minutesPlayed) {
         this.playerId = playerId;
         this.seed = seed;
         this.entry = entry;
@@ -34,9 +34,11 @@ public class Player  {
         this.rank = rank;
         this.rankPoints = rankPoints;
         this.matchesPlayed = matchesPlayed != null ? matchesPlayed : new ArrayList<>();
+        this.minutesPlayed = minutesPlayed;
+
     }
     public Player(String winnerId, String wseed, String wentry, String winnerName, String whand, Integer wheight,
-            String wioc, Double wage, String winner_rank, String winner_rank_points) {
+            String wioc, Double wage, String winner_rank, String winner_rank_points,int minutesPlayed) {
         this.playerId = winnerId;   
         this.seed = wseed;
                 this.entry = wentry;
@@ -48,6 +50,8 @@ public class Player  {
                 this.rank = winner_rank;
                 this.rankPoints = winner_rank_points;
                 this.matchesPlayed = new ArrayList<>();
+        this.minutesPlayed = minutesPlayed;
+
     
     }
     public String getPlayerId() {
@@ -133,10 +137,28 @@ public class Player  {
     public void addMatch(Match match) {
     matchesPlayed.add(match);
 }
+public void addMinutesPlayed(int minutes) {
+    this.minutesPlayed += minutes;
+}
 
 public List<Match> getMatchesPlayed() {
     return matchesPlayed;
 }
+public List<Match> getMatchesWon() {
+    return matchesWon;
+
+}
+public List<Match> getMatchesLost() {
+    return matchesLost;
+
+}
+    public int getMinutesPlayed() {
+        return minutesPlayed;
+    }
+    public void setMinutesPlayed(int minutesPlayed) {
+        this.minutesPlayed = minutesPlayed;
+    }
+
     @Override
     public String toString() {
         return name + " (" + playerId + ")";

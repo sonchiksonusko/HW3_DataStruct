@@ -50,11 +50,16 @@ public class Main {
 
 
     System.out.println("THE LONGEST MATCH PLAYER: ");     
-    longestPlayerGameTime(allMatches); 
+    System.out.println(longestPlayerGameTime(allPlayersMap).getName(longestPlayerGameTime(allPlayersMap))+ " - Total Minutes Played: " + longestPlayerGameTime(allPlayersMap).getMinutesPlayed()   + " minutes"); 
     System.out.println("----------------------------------------------------------------------------------------------");
 
-
-
+    System.out.println("GET THE LONGEST AVERAGE PLAYER: ");
+    System.out.println(AveragebiggestPlayer(allPlayersMap).getName(AveragebiggestPlayer(allPlayersMap)) + " - Average Minutes Played: " + (AveragebiggestPlayer(allPlayersMap).getMinutesPlayed() / AveragebiggestPlayer(allPlayersMap).matchesPlayed.size()) + " minutes");
+    System.out.println("----------------------------------------------------------------------------------------------");
+    
+    System.out.println("COUNT OF ALL PLAYERS: ");
+    System.out.print(allPlayersMap.size()+"\n");
+    System.out.println("----------------------------------------------------------------------------------------------");
 
     
     Player[] playerArray = allPlayersMap.values().toArray(new Player[0]);
@@ -171,17 +176,16 @@ public static void readMatchesAndMapsFromCSV(String myFile) {
       
           Player winner = allPlayersMap.getOrDefault(winnerName, new Player(
     winnerId, wseed, wentry, winnerName, whand, wheight, wioc, wage,
-    winner_rank, winner_rank_points
+    winner_rank, winner_rank_points,minutes 
 ));
 Player loser = allPlayersMap.getOrDefault(loserName, new Player(
     loserId, lseed, lentry, loserName, lhand, lheight, lioc, lage,
-    loser_rank, loser_rank_points
-));
+    loser_rank, loser_rank_points,minutes));
            
             
  if (!allPlayersMap.containsKey(winnerName)) {
                 winner = new Player(winnerId, wseed, wentry, winnerName, whand, wheight, wioc, wage,
-                                    winner_rank, winner_rank_points);
+                                    winner_rank, winner_rank_points,minutes);
                 allPlayersMap.put(winnerName, winner);
                 countryPlayerMap.computeIfAbsent(wioc, k -> new ArrayList<>()).add(winner);
             } else {
@@ -191,7 +195,7 @@ Player loser = allPlayersMap.getOrDefault(loserName, new Player(
             loser = allPlayersMap.get(loserName);
             if (loser == null) {
                 loser = new Player(loserId, lseed, lentry, loserName, lhand, lheight, lioc, lage,
-                                loser_rank, loser_rank_points);
+                                loser_rank, loser_rank_points,minutes);
              allPlayersMap.put(loserName, loser);
                 countryPlayerMap.computeIfAbsent(lioc, k -> new ArrayList<>()).add(loser);
             } else {
@@ -220,8 +224,8 @@ Player loser = allPlayersMap.getOrDefault(loserName, new Player(
             loser.addMatch(match);
             winner.matchesWon.add(match);
             loser.matchesLost.add(match);
-            winner.minutesPlayed += minutes;
-            loser.minutesPlayed += minutes;
+            winner.addMinutesPlayed(minutes);
+            loser.addMinutesPlayed(minutes);
 
    
            
@@ -322,21 +326,20 @@ private static <T> void swap(T[] arr, int i, int j) {
 
 
 
-// public static void AveragebiggestPlayer(List<Player> allPlayers) {
-//    List<Player> sortedbygametime = new ArrayList<>(allPlayers);
-//    double min = 0.0;
-  
-//     sortedbygametime.sort(new Comparators.PlayerWinningComparator());
-//     for (Player player : sortedbygametime) {
-//         int countMatches = player.matchesPlayed.size();
-//          double averageGameTime = matchCounts
-//         if((player) > min) {
-//             min = averageGameTime(player);
-          
-//         }
-//     }
-//      System.out.println("Player with the longest average game time: " + player.getName(player) + " - Average Game Time: " + min + " minutes");
-// }
+public static Player AveragebiggestPlayer(HashMap<String,Player> allPlayersMap) {
+    double maxAverage = 0;
+    Player longestaverageplayer = null;
+    for(Player player : allPlayersMap.values()) {
+        double average = player.matchesPlayed.size() > 0 ? (double) player.minutesPlayed / player.matchesPlayed.size() : 0;
+        if (average > maxAverage) {
+            maxAverage = average;
+            longestaverageplayer = player;
+        }
+       
+    }
+    return longestaverageplayer;
+   
+}
 
 
 
@@ -457,33 +460,18 @@ System.out.print(player2Wins.get("Hard"));
 
 
 
-public static Player longestPlayerGameTime(List<Match> allMatches) {
-    Map<Player, Integer> totalDurations = new HashMap<>();
-    Map<Player, Integer> matchCounts = new HashMap<>();// Map to count matches for each player
-
-    for (Match match : allMatches) {
-        Integer minutes = match.getMinutes();
-        if (minutes == null) continue;
-
-        totalDurations.merge(match.getWinner(), minutes, Integer::sum);
-        matchCounts.merge(match.getWinner(), 1, Integer::sum);
-
-        totalDurations.merge(match.getLoser(), minutes, Integer::sum);
-        matchCounts.merge(match.getLoser(), 1, Integer::sum);
-}
-        Player longestPlayer = null;
-        int maxDuration = -1;
-        for (Map.Entry<Player, Integer> entry : totalDurations.entrySet()) {
-            if (entry.getValue() > maxDuration) {
-                maxDuration = entry.getValue();
-                longestPlayer = entry.getKey();
-            }
+public static Player longestPlayerGameTime(HashMap<String,Player> allPlayersMap) {
+    Player longestPlayer = null;
+    int maxMinutes = 0;
+    for (Player player : allPlayersMap.values()) {
+        if (player.getMinutesPlayed() > maxMinutes) {
+            maxMinutes = player.getMinutesPlayed();
+            longestPlayer = player;
+            
         }
-        
-        System.out.println("Match counts of : "+longestPlayer+" = " + matchCounts.get(longestPlayer));
-        System.out.println("The Longest time in all matches : "+totalDurations.get(longestPlayer));
-
-        return longestPlayer;
+    }
+    return longestPlayer;
+    
 }
 
 
