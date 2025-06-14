@@ -34,7 +34,7 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
 //compare by number of tournaments won
         int wins1 = countTournamentsWon(p1);
         int wins2 = countTournamentsWon(p2);
-        return Integer.compare(wins2, wins1); // dea
+        return Integer.compare(wins1, wins2); //decreasing order
     }
 
     private int countTournamentsWon(Player player) {
@@ -86,7 +86,7 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
         int wins1 = countWins(p1);
         int wins2 = countWins(p2);
 
-        return Integer.compare(wins2, wins1); 
+        return Integer.compare(wins1, wins2); 
     }
 
     public static int countWins(Player p) {

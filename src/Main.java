@@ -269,13 +269,13 @@ public static <T> void get_K_winners(T[] arr, int k, Comparator<T> comparator) {
     }
    quickselect(arr, 0, arr.length - 1, arr.length - k , comparator);
    List<T> result = new ArrayList<>();
-     for (int i = 0; i < k; i++) {
+     for (int i = arr.length - k; i < arr.length; i++) {
         result.add(arr[i]); // Get the k largest elements
     }
 
     result.sort(comparator); // Sort the result in descending order
-    for (T item : result) {
-        System.out.println(item);
+    for (int i = result.size() - 1; i >= 0; i--) {
+        System.out.println(result.get(i)); // Print the k largest elements
     }
 }
 
