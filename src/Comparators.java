@@ -14,47 +14,59 @@ public static class MatchDurationComparator implements Comparator<Match> {
             if (m1.getMinutes() == null && m2.getMinutes() == null) return 0;
             if (m1.getMinutes() == null) return -1;
             if (m2.getMinutes() == null) return 1;
-            return m1.getMinutes().compareTo(m2.getMinutes());
+            return Integer.compare(m2.getMinutes(), m1.getMinutes());
         }      
 }
 
 
 public static class TournamentWinnerComparator implements Comparator<Player> {
-    private final Map<String, Tournament> allTournaments;
-    private final Map<String,List<Match>> tourneyMatches;
+    private final List<Match> finalMatches;
+    //private final Map<String,List<Match>> tourneyMatches;
 
-    public TournamentWinnerComparator(Map<String, Tournament> allTournaments,Map<String,List<Match>> tourneyMatches) {
-        this.allTournaments = allTournaments;
-        this.tourneyMatches = tourneyMatches;
+    public TournamentWinnerComparator(List<Match> finalMatches)  {
+        this.finalMatches = finalMatches;
+        //this.tourneyMatches = tourneyMatches;
     }
    
 
     @Override
     public int compare(Player p1, Player p2) {
-        // Сравнение игроков по количеству выигранных турниров
+//compare by number of tournaments won
         int wins1 = countTournamentsWon(p1);
         int wins2 = countTournamentsWon(p2);
-        return Integer.compare(wins2, wins1); // Сортировка по убыванию
+        return Integer.compare(wins2, wins1); // dea
     }
 
     private int countTournamentsWon(Player player) {
         int count = 0;
-        for (Tournament t : allTournaments.values()) {
-            List<Match> matches = t.tourneyId != null ? tourneyMatches.get(t.getTourneyId()) : null;
-            if (matches != null) {
-                for (Match match : matches) {
-                    if ("F".equals(match.getRound())) { 
-                        Player winner = match.getWinner();
-                        if (winner != null && winner.getPlayerId().equals(player.getPlayerId())) {
-                            count++;
-                        }
-                    }
+        for (Match m : finalMatches) {
+            
+                if (m.getWinner().getPlayerId().equals(player.getPlayerId())) {
+                count++; // skip if winner is null    
                 }
-            }
         }
-        return count;
+           return count;
     }
+
 }
+    // private int countTournamentsWon(Player player) {
+    //     int count = 0;
+    //     for (Tournament t : allTournaments.values()) {
+    //         List<Match> matches = t.tourneyId != null ? tourneyMatches.get(t.getTourneyId()) : null;
+    //         if (matches != null) {
+    //             for (Match match : matches) {
+    //                 if ("F".equals(match.getRound())) { 
+    //                     Player winner = match.getWinner();
+    //                     if (winner != null && winner.getPlayerId().equals(player.getPlayerId())) {
+    //                         count++;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return count;
+    // }
+
 
 
 
@@ -68,7 +80,8 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
             if (m2.getScore() == null) return 1;
             return m1.getScore().compareTo(m2.getScore());
         }
-    }public static class PlayerWinningComparator implements Comparator<Player> {
+    }
+    public static class PlayerWinningComparator implements Comparator<Player> {
         public int compare(Player p1, Player p2) {
         int wins1 = countWins(p1);
         int wins2 = countWins(p2);
@@ -85,7 +98,8 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
         }
         return count;
     }
-}public static class PlayerPercentageComparator implements Comparator<Player> {
+}
+public static class PlayerPercentageComparator implements Comparator<Player> {
         @Override
         public int compare(Player p1, Player p2) {
             double winPercentage1 = calculateWinPercentage(p1);
@@ -131,4 +145,4 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
             return totalMatches > 0 ? (double) wins / totalMatches : 0.0;
         }
     }
-}
+    }

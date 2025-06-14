@@ -12,42 +12,77 @@ import java.util.Map;
 import java.util.Set;
 import src.Comparators;
 public class Main {
-    static  Map<String, List<Match>> tourneyMatches = new HashMap<>();
+    static  HashMap<String, List<Match>> tourneyMatches = new HashMap<>();
     static List<Match> allMatches = new ArrayList<>();
     static HashMap<String, Player> allPlayersMap = new HashMap<>();
-    static Map<String, Tournament> allTournaments = new HashMap<>();
+    static HashMap<Tournament,List<Match>> finalMatchesTournaments = new HashMap<>();
     static HashMap<String,List<Player>> countryPlayerMap = new HashMap<>();
+    static HashMap<String, Tournament> allTournaments = new HashMap<>(); // Store all tournaments by tourneyId
+    static List<Match> finalMatches = new ArrayList<>(); // Store all final matches
  public static void main(String[] args) {
     // Read matches and tournament maps from CSV
     
 
-    readMatchesAndMapsFromCSV("atp_matches_2010.csv", allMatches, tourneyMatches, allPlayersMap, allTournaments,countryPlayerMap);
+    readMatchesAndMapsFromCSV("atp_matches_2010.csv");
 
     // -------------------------------------------------------------------------------------------------------------------
+
+    System.out.println("ALL UNIQUE TOURNAMENT NAMES: ");
+    printUniqueTournamentNames(tourneyMatches);
+    System.out.println("----------------------------------------------------------------------------------------------");
+
+    System.out.println("COUNT OF ALL PLAYERS: " + allPlayersMap.size());//************************** */
+   
+
+
     System.out.println("ACCORDING TO TOURNAMENT MATCHES");
     printUniqueTournamentNames(tourneyMatches);
-    System.out.println("ACCORDING TO ALL MATCHES");
-    //Match longest = theBiggest( allMatches.toArray(new Match[0]), 0,new Comparators.MatchDurationComparator()   );
-    //
-    Player thelongestMatchPlayer = longestPlayerGameTime(allMatches);
-    System.out.println(thelongestMatchPlayer);  
+    System.out.println("----------------------------------------------------------------------------------------------");
 
+
+
+    System.out.println("THE LONGEST MATCH: ");
+    // Find the longest match using the custom comparator
+    Match longest = thelongestMatch( allMatches.toArray(new Match[0]),0,new Comparators.MatchDurationComparator());
+    System.out.println(longest.getTournament().getName() + " - Duration: " + longest.getMinutes() + " minutes");
+    System.out.println("----------------------------------------------------------------------------------------------");
+
+
+
+    System.out.println("THE LONGEST MATCH PLAYER: ");     
+    longestPlayerGameTime(allMatches); 
+    System.out.println("----------------------------------------------------------------------------------------------");
+
+
+
+
+    
     Player[] playerArray = allPlayersMap.values().toArray(new Player[0]);
+    System.out.print(playerArray);
     System.out.println(theBiggest(playerArray,0,new Comparators.PlayerWinningComparator()));
+    System.out.println("----------------------------------------------------------------------------------------------");
 
     System.out.println("GET TOP 5 WINNERS in Maches");
     get_K_winners(playerArray, 5, new Comparators.PlayerWinningComparator());  
+    System.out.println("----------------------------------------------------------------------------------------------");
+
 
     System.out.println("GET TOP 5 WINNERS in Tournaments");
-    get_K_winners(playerArray, 5, new Comparators.TournamentWinnerComparator(allTournaments,tourneyMatches));  
 
-    System.out.println("By COUNTRY Players from same country");
+    get_K_winners(playerArray, 7, new Comparators.TournamentWinnerComparator(finalMatches));  
+    System.out.println("----------------------------------------------------------------------------------------------");
+
+
+
+    System.out.println("BY PLAYERS FROM THE SAME COUNTRY"+"\n");
     printPlayersFromSameCountry(countryPlayerMap,"ISR");
+    System.out.println("----------------------------------------------------------------------------------------------");
 
-    System.out.println("Compare Players by Winning Count");
+    System.out.println("COMPARE PLAYERS BY WINNING COUNT: "+"\n");
     PlayerComparatorbywinningCount("Rafael Nadal", "Roger Federer");
 
-    System.out.println("Compare Players by Winning Percentage on Surface: "+"\n");
+    System.out.println("----------------------------------------------------------------------------------------------");   
+    System.out.println("COMPARE PLAYERS BY WINNING ON SERFACE"+"\n");
     PlayerComparatorbywinningPercent("Rafael Nadal", "Roger Federer");
 }
 
@@ -56,7 +91,7 @@ public class Main {
 
 
 
-public static void readMatchesAndMapsFromCSV(String myFile, List<Match> allMatches, Map<String, List<Match>> tourneyMatches,  HashMap<String, Player> allPlayersMap, Map<String, Tournament> allTournaments,HashMap<String,List<Player>> countryPlayerMap) {
+public static void readMatchesAndMapsFromCSV(String myFile) {
     try (BufferedReader br = new BufferedReader(new FileReader(myFile))) {
         String line;
         boolean firstLine = true;
@@ -169,13 +204,18 @@ Player loser = allPlayersMap.getOrDefault(loserName, new Player(
             tournament, matchNum, round, bestOf, minutes, score, winner, loser,
             w_ace, w_df, w_svpt, w_1stIn, w_1stWon, w_2ndWon, w_SvGms, w_bpSaved, w_bpFaced,
             l_ace, l_df, l_svpt, l_1stIn, l_1stWon, l_2ndWon, l_SvGms, l_bpSaved, l_bpFaced
+
 );
+            if ("F".equals(round)) {
+            finalMatchesTournaments.computeIfAbsent(tournament, k -> new ArrayList<>()).add(match);
+            finalMatches.add(match);
+}
 
            // allPlayersMap.put(winnerId, winner);
           //  allPlayersMap.put(loserId, loser);
             allMatches.add(match);
-            //tourneyMatches.computeIfAbsent(tourneyId, k -> new ArrayList<>()).add(match);
-            allTournaments.putIfAbsent(tourneyId, tournament);
+            tourneyMatches.computeIfAbsent(tourneyId, k -> new ArrayList<>()).add(match);
+            //finalMatchesTournaments.putIfAbsent(tournament, tournament);
             winner.addMatch(match);
             loser.addMatch(match);
             winner.matchesWon.add(match);
@@ -193,7 +233,7 @@ Player loser = allPlayersMap.getOrDefault(loserName, new Player(
             //System.out.println("Loser: " + loser.getName() + " from " + lioc);
 
             
-           // allplayers.add(loser);
+           //allplayers.add(loser);
         }
     } catch (IOException e) {
         e.printStackTrace();
@@ -217,20 +257,22 @@ public static void printUniqueTournamentNames(Map<String, List<Match>> tourneyMa
         System.out.println(name);
     }
 }
-/*public static Match thelongestMatch(T[] arr,int k) {
-    return quickselect(arr, 0, arr.length - 1, k);
-}*/
+
+ public static <T> Match thelongestMatch(T[] arr,int k, Comparator<T> comparator) {
+    return (Match) theBiggest(arr, k, comparator);
+}
 
 
 public static <T> void get_K_winners(T[] arr, int k, Comparator<T> comparator) {
     if (k < 0 || k >= arr.length) {
         throw new IllegalArgumentException("Invalid value of k");
     }
-    quickselect(arr, 0, arr.length - 1, arr.length - k , comparator);
+   quickselect(arr, 0, arr.length - 1, arr.length - k , comparator);
    List<T> result = new ArrayList<>();
-    for (int i = 0; i < k; i++) {
+     for (int i = 0; i < k; i++) {
         result.add(arr[i]); // Get the k largest elements
     }
+
     result.sort(comparator); // Sort the result in descending order
     for (T item : result) {
         System.out.println(item);
@@ -273,6 +315,29 @@ private static <T> void swap(T[] arr, int i, int j) {
     arr[i] = arr[j];
     arr[j] = temp;
 }
+
+
+
+
+// public static void AveragebiggestPlayer(List<Player> allPlayers) {
+//    List<Player> sortedbygametime = new ArrayList<>(allPlayers);
+//    double min = 0.0;
+  
+//     sortedbygametime.sort(new Comparators.PlayerWinningComparator());
+//     for (Player player : sortedbygametime) {
+//         int countMatches = player.matchesPlayed.size();
+//          double averageGameTime = matchCounts
+//         if((player) > min) {
+//             min = averageGameTime(player);
+          
+//         }
+//     }
+//      System.out.println("Player with the longest average game time: " + player.getName(player) + " - Average Game Time: " + min + " minutes");
+// }
+
+
+
+
 
 
 public static void printPlayersFromSameCountry(HashMap<String,List<Player>> countryPlayerMap, String country) {
@@ -391,7 +456,7 @@ System.out.print(player2Wins.get("Hard"));
 
 public static Player longestPlayerGameTime(List<Match> allMatches) {
     Map<Player, Integer> totalDurations = new HashMap<>();
-    Map<Player, Integer> matchCounts = new HashMap<>();
+    Map<Player, Integer> matchCounts = new HashMap<>();// Map to count matches for each player
 
     for (Match match : allMatches) {
         Integer minutes = match.getMinutes();
@@ -405,7 +470,7 @@ public static Player longestPlayerGameTime(List<Match> allMatches) {
 }
         Player longestPlayer = null;
         int maxDuration = -1;
-           for (Map.Entry<Player, Integer> entry : totalDurations.entrySet()) {
+        for (Map.Entry<Player, Integer> entry : totalDurations.entrySet()) {
             if (entry.getValue() > maxDuration) {
                 maxDuration = entry.getValue();
                 longestPlayer = entry.getKey();
