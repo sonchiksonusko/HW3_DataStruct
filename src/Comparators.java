@@ -75,27 +75,8 @@ public static class PlayerPercentageComparator implements Comparator<Player> {
             double winPercentage2 = calculateWinPercentage(p2);
             int loseCount1 = p1.getMatchesLost().size();
             int loseCount2 = p2.getMatchesLost().size();
-            // i need to add winner and loser matches !!!!!!!!!!!!!!!!!!!!!!!!!!
-            int winCount1 = p1.getMatchesWon().size();// i need to add winner and loser matches !!!!!!!!!!!!!!!!!!!!!!!!!!
-            // for (Match match : p1.getMatchesPlayed()) {
-            //     if(match.getWinner().getPlayerId().equals(p1.getPlayerId())) {
-            //         winCount1++;
-            //     } 
-            //     if(match.getLoser().getPlayerId().equals(p1.getPlayerId())) {
-            //         loseCount1++;
-            //     }
-
-            // }
+            int winCount1 = p1.getMatchesWon().size();//  matchesWon contains only won matches
             int winCount2 = p1.getMatchesWon().size();
-            // for (Match match : p2.getMatchesPlayed()) {
-            //     if (match.getWinner() != null && match.getWinner().getPlayerId().equals(p2.getPlayerId())) {
-            //         winCount2++;
-            //     } 
-            //      if(match.getLoser().getPlayerId().equals(p1.getPlayerId())) {
-            //         loseCount2++;
-            //     }
-            // }
-
             if(Double.compare(winPercentage2, winPercentage1)!=0)   
             return Double.compare(winPercentage2, winPercentage1); 
             else

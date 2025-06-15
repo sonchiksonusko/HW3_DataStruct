@@ -76,6 +76,8 @@ public class Main {
 
     System.out.println("COMPARE PLAYERS BY WINNING COUNT: "+"\n");
     PlayerComparatorbywinningCount("Rafael Nadal", "Roger Federer");
+    PlayerComparatorbywinningCount("Rafael Nadal", "Novak Djokovic");
+    PlayerComparatorbywinningCount("Roger Federer","Novak Djokovic");
 
     System.out.println("----------------------------------------------------------------------------------------------");   
     System.out.println("COMPARE PLAYERS BY WINNING ON SERFACE"+"\n");
@@ -327,14 +329,13 @@ public static Player AveragebiggestPlayer(HashMap<String,Player> allPlayersMap) 
 public static void printPlayersFromSameCountry(HashMap<String,List<Player>> countryPlayerMap, String country) {
    
     Player[] players = countryPlayerMap.get(country).toArray(new Player[0]);
-   java.util.Arrays.sort(players, new Comparators.PlayerPercentageComparator());////add winner loser matches + ptint
+   java.util.Arrays.sort(players, new Comparators.PlayerPercentageComparator());
     System.out.println("Players from country " + country + ":");
     for (Player player : players) {
-        System.out.println(Player.getName(player) + " - Matches Played: " +(player.matchesPlayed.size())+" Percentage "+ (player.matchesWon.size()*100.0 / player.matchesPlayed.size()) + " % "+ player.matchesWon.size()+" Wins");
+        System.out.println(Player.getName(player) + " - Matches Played: " +(player.matchesPlayed.size())+
+        " Percentage "+ (player.matchesWon.size()*100.0 / player.matchesPlayed.size()) + " % "+ player.matchesWon.size()+" Wins");
     }
-    // Uncomment to get top winners from this country
-    // System.out.println("Top winners from country " + country + ":");
-    // get_K_winners(players,players.length, new Comparators.PlayerWinningComparator());
+ 
 }
 
 public static void PlayerComparatorbywinningCount(String p1, String p2) {
@@ -355,11 +356,11 @@ public static void PlayerComparatorbywinningCount(String p1, String p2) {
             countplayer2wins++;
         }
     }
-    int compareResult = Integer.compare(countplayer1wins, countplayer2wins);
+
     System.out.println("Player 1: " + player1.getName(player1) + " Wins: " + countplayer1wins);
     System.out.println("Player 2: " + player2.getName(player2) + " Wins: " + countplayer2wins);
     System.out.println("Common Games: " + countcommongames);
-    //System.out.println("Player 1 > player 2 ? " + (countplayer1wins > countplayer2wins ? "Yes" : "No"));
+
 
 
 }
@@ -425,8 +426,7 @@ public static void PlayerComparatorbywinningPercent(String p1, String p2){
     }
    
  
-System.out.print(player2Wins.get("Hard"));
- System.out.println("p2counthard: " + p2counthard);
+
     System.out.println(player1.getName(player1) + " Wins on Hard Percentage: " + player1Wins.get("Hard")*100/(p1counthard)  + " %" );
     System.out.println( player1.getName(player1) + " Wins on Clay Percentage: " + player1Wins.get("Clay")*100/(p1countclay)  + " %" );
     System.out.println(player1.getName(player1) + " Wins on Grass Percentage: " + player1Wins.get("Grass")*100/(p1countgrass)  + " %" + "\n");
