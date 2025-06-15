@@ -11,7 +11,7 @@ public class Comparators {
 public static class MatchDurationComparator implements Comparator<Match> {
         @Override
         public int compare(Match m1, Match m2) {
-            // Сравнение матчей по длительности (минуты), учитывая null
+        
             if (m1.getMinutes() == null && m2.getMinutes() == null) return 0;
             if (m1.getMinutes() == null) return -1;
             if (m2.getMinutes() == null) return 1;
@@ -21,8 +21,6 @@ public static class MatchDurationComparator implements Comparator<Match> {
 
 
 public static class TournamentWinnerComparator implements Comparator<Player> {
-   
-
     @Override
     public int compare(Player p1, Player p2) {
 //compare by number of tournaments won
@@ -30,10 +28,9 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
         int wins2 = countTournamentsWon(p2);
         return Integer.compare(wins2, wins1); //decreasing order
     }
-
     public static int countTournamentsWon(Player player) {
         int count = 0;
-        for (Match m : Main.finalMatches) {
+        for (Match m : Main.finalMatches) { 
             
                 if (m.getWinner().getPlayerId().equals(player.getPlayerId())) {
                 count++; // skip if winner is null    
@@ -41,27 +38,8 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
         }
            return count;
     }
-
 }
-    // private int countTournamentsWon(Player player) {
-    //     int count = 0;
-    //     for (Tournament t : allTournaments.values()) {
-    //         List<Match> matches = t.tourneyId != null ? tourneyMatches.get(t.getTourneyId()) : null;
-    //         if (matches != null) {
-    //             for (Match match : matches) {
-    //                 if ("F".equals(match.getRound())) { 
-    //                     Player winner = match.getWinner();
-    //                     if (winner != null && winner.getPlayerId().equals(player.getPlayerId())) {
-    //                         count++;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return count;
-    // }
-
-
+  
 
 
 
@@ -75,6 +53,8 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
             return m1.getScore().compareTo(m2.getScore());
         }
     }
+
+
     public static class PlayerWinningComparator implements Comparator<Player> {
         public int compare(Player p1, Player p2) {
         int wins1 = countWins(p1);
@@ -82,44 +62,39 @@ public static class TournamentWinnerComparator implements Comparator<Player> {
 
         return Integer.compare(wins2, wins1); 
     }
-
     public static int countWins(Player p) {
-        int count = 0;
-        for (Match match : p.getMatchesPlayed()) {
-            if (match.getWinner().getPlayerId().equals(p.getPlayerId())) {
-                count++;
-            }
-        }
-        return count;
+        return p.getMatchesWon().size(); // Assuming matchesWon contains only won matches
     }
 }
+
+
 public static class PlayerPercentageComparator implements Comparator<Player> {
         @Override
         public int compare(Player p1, Player p2) {
             double winPercentage1 = calculateWinPercentage(p1);
             double winPercentage2 = calculateWinPercentage(p2);
-            int loseCount1 = 0;
-            int loseCount2 = 0;
+            int loseCount1 = p1.getMatchesLost().size();
+            int loseCount2 = p2.getMatchesLost().size();
             // i need to add winner and loser matches !!!!!!!!!!!!!!!!!!!!!!!!!!
-            int winCount1 =0;// i need to add winner and loser matches !!!!!!!!!!!!!!!!!!!!!!!!!!
-            for (Match match : p1.getMatchesPlayed()) {
-                if(match.getWinner().getPlayerId().equals(p1.getPlayerId())) {
-                    winCount1++;
-                } 
-                if(match.getLoser().getPlayerId().equals(p1.getPlayerId())) {
-                    loseCount1++;
-                }
+            int winCount1 = p1.getMatchesWon().size();// i need to add winner and loser matches !!!!!!!!!!!!!!!!!!!!!!!!!!
+            // for (Match match : p1.getMatchesPlayed()) {
+            //     if(match.getWinner().getPlayerId().equals(p1.getPlayerId())) {
+            //         winCount1++;
+            //     } 
+            //     if(match.getLoser().getPlayerId().equals(p1.getPlayerId())) {
+            //         loseCount1++;
+            //     }
 
-            }
-            int winCount2 = 0;
-            for (Match match : p2.getMatchesPlayed()) {
-                if (match.getWinner() != null && match.getWinner().getPlayerId().equals(p2.getPlayerId())) {
-                    winCount2++;
-                } 
-                 if(match.getLoser().getPlayerId().equals(p1.getPlayerId())) {
-                    loseCount2++;
-                }
-            }
+            // }
+            int winCount2 = p1.getMatchesWon().size();
+            // for (Match match : p2.getMatchesPlayed()) {
+            //     if (match.getWinner() != null && match.getWinner().getPlayerId().equals(p2.getPlayerId())) {
+            //         winCount2++;
+            //     } 
+            //      if(match.getLoser().getPlayerId().equals(p1.getPlayerId())) {
+            //         loseCount2++;
+            //     }
+            // }
 
             if(Double.compare(winPercentage2, winPercentage1)!=0)   
             return Double.compare(winPercentage2, winPercentage1); 

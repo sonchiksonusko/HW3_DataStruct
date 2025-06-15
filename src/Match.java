@@ -2,14 +2,14 @@ package src;
 
 public class Match  {
     // Tournament-related fields
-    public Tournament tournament;    // End date of tournament, yyyymmdd
+    public Tournament tournament;    //
 
     // Match-related fields
-    public int matchNum;          // Match number within the tournament
-    public String round;          // Round (e.g., "F", "SF", "QF", "R16", etc.)
-    public int bestOf;            // Number of sets (3 or 5)
-    public Integer minutes;       // Duration in minutes, can be null
-    public String score;          // Match score (e.g., "6-3 6-4")
+    public int matchNum;         
+    public String round;         
+    public int bestOf;            
+    public Integer minutes;       
+    public String score;          
 
     // Winner fields
     public Player winner; // Player object for the winner
@@ -63,12 +63,6 @@ public class Match  {
         this.l_bpFaced = l_bpFaced;
     
     }
-
-   /*  @Override
-    public String toString() {
-        return "[" + tournament.name + " " + tournament.date + " | " + round + "] "
-            + winner.name + " def. " + loser.name + " (" + score + ")";
-    */
 
 
   

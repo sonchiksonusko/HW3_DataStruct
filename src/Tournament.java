@@ -1,12 +1,12 @@
 package src;
 
 public class Tournament {
-public String tourneyId;      // Unique tournament code, e.g. "2010-339"
-    public String name;           // Tournament name, e.g. "Brisbane"
-    public String surface;        // Surface type: "Hard", "Clay", "Grass", or "Carpet"
-    public int drawSize;          // Number of players in the draw
-    public String level;          // Tournament level: "G" (Grand Slam), "M" (Masters), "A" (ATP), "D" (Davis Cup), etc.
-    public String date;           // End date of tournament, yyyymmdd
+public String tourneyId;     
+    public String name;         
+    public String surface;      
+    public int drawSize;
+    public String level;         
+    public String date;           
 
     public Tournament(String tourneyId, String name, String surface, int drawSize, String level, String date) {
         this.tourneyId = tourneyId;

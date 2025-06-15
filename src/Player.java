@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player  {
-  
-
     // Player-related fields
- public String playerId;
- public String seed;
- public String entry;
+    public String playerId;
+    public String seed;
+    public String entry;
     public String name;
     public String hand;
     public Integer height; // cm
@@ -17,10 +15,11 @@ public class Player  {
     public Double age; // years
     public String rank;
     public String rankPoints;
-    public List<Match> matchesPlayed = new ArrayList<>();
+    public List<Match> matchesPlayed = new ArrayList<>();// matches played by the player
     public List<Match> matchesWon = new ArrayList<>();
     public List<Match> matchesLost = new ArrayList<>();
     public int minutesPlayed = 0; // total minutes played in matches
+
 
     public Player(String playerId,String seed, String entry ,String name, String hand, Integer height, String ioc, Double age, String rank, String rankPoints, List<Match> matchesPlayed,int minutesPlayed) {
         this.playerId = playerId;
